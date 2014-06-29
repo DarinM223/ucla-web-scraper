@@ -1,0 +1,10 @@
+{
+    "name": "UCLAscraper",
+    "version": "0.0.0",
+    "description": "Web scraper for UCLA's schedule of classes",
+    "dependencies": {
+        "request": "*",
+        "cheerio": "*"
+    },
+    "author": "developer"
+}
