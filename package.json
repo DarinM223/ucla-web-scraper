@@ -5,7 +5,9 @@
     "dependencies": {
         "request": "*",
         "cheerio": "*",
-        "async": "*"
+        "async": "*",
+        "mongodb": "*",
+        "monk": "*"
     },
     "author": "developer"
 }

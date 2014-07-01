@@ -3,6 +3,9 @@ var request = require('request');
 var cheerio = require('cheerio');
 var async = require('async');
 var cluster = require('cluster');
+var monk = require('monk');
+var db = monk('localhost:27017/ucla');
+var collection = db.get('14F');
 
 // attribute list
 var nameArr = [
@@ -172,7 +175,12 @@ function generateJSON(classList, classDesc, subject, term) {
     finalObj.subject = subject;
     finalObj.classDesc = classDesc.trim();
     finalObj.classes = classList;
-    console.log(finalObj);
+    collection.insert(finalObj, function (err, data) {
+        if (err) {
+            console.log("Error inserting into database!");
+        } 
+    });
+    console.log("Added " + finalObj.subject + finalObj.classDesc);
 }
 
 // builds JSON based on classes
