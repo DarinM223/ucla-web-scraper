@@ -93,23 +93,18 @@ function getClassData(body, callback) {
   // O(n^2) running time
   var objArr = utilities.transform(selectionData, nameArr);
 
-  var index = 0;
-  (function(index) {
-    // get course links
-    $('.dgdTemplateGrid').each(function() {
-      var a = $(this).find('.dgdClassDataColumnIDNumber a').first();
-      if (a && a[0] && a[0].type === 'tag') {
-        if (objArr[index]) {
-          // for each course link callback with class list
-          callback(null, objArr[index], a[0].attribs.href); 
-          index++;
-        }
-      }
-    });
-  })(index);
+  var courseLinks = [];
+  // get course links
+  $('.dgdTemplateGrid').each(function() {
+    var a = $(this).find('.dgdClassDataColumnIDNumber a').first();
+    if (a && a[0] && a[0].type === 'tag') {
+      courseLinks.push(a[0].attribs.href);
+    }
+  });
+  callback(null, objArr, courseLinks);
 }
 
-function getSectionData(body, classList, callback) {
+function getSectionData(body, classData) {
   var $ = cheerio.load(body);
   var instructorData = null, finalData = null;
 
@@ -127,9 +122,8 @@ function getSectionData(body, classList, callback) {
     }
   });
 
-  classList.instructor = instructorData;
-  classList.final = finalData;
-  callback(null, classList);
+  classData.instructor = instructorData;
+  classData.final = finalData;
 }
 
 function generateJSON(term, subject, classDesc, classList) {
