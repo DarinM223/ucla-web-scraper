@@ -23,10 +23,9 @@ Then in the root directory of the project, enter:
 
 To install the dependencies. To run the server, enter:
 
-    node scraper.js
+    node main.js
 
-It should eventually (after a long time) start printing "Added [Course]" for every
-course added. Right now after it finishes adding all of the courses it will hang
+Right now after it finishes adding all of the courses it will hang
 and you will have to end the process by pressing Ctrl-C.
 
 The scraper should take around 10-20 minutes to run on an i5
