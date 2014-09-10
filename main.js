@@ -32,7 +32,7 @@ function loadTerm(term) {
                 '&subareasel=' + mySubject + '&idxcrs=' + 
                 classDesc.split(' ').join('+');
 
-                // send task to least used worker
+                // send task to worker
                 var myWorker= getWorker(clusterArr);
                 myWorker.worker.send({
                   url: url,
@@ -74,7 +74,7 @@ function generateClusters() {
 
 if (cluster.isMaster) {
   generateClusters();
-  console.log(clusterArr.length);
+  console.log('Created ' + clusterArr.length + ' workers');
   loadTerm('14F');
 } else {
   process.on('message', function(task) {
