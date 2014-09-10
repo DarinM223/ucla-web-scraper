@@ -137,8 +137,6 @@ function generateJSON(term, subject, classDesc, classList) {
   collection.insert(finalObj, function(err, data) {
     if (err)
       console.log('Error inserting into database');
-    else
-      console.log('Added ' + data.subject + data.classDesc);
   });
 }
 
