@@ -2,11 +2,16 @@
     "name": "UCLAscraper",
     "version": "0.0.0",
     "description": "Web scraper for UCLA's schedule of classes",
+    "scripts": {
+      "test": "./node_modules/.bin/mocha"
+    },
     "dependencies": {
         "request": "*",
         "cheerio": "*",
         "mongodb": "*",
-        "monk": "*"
+        "monk": "*",
+        "should": "*",
+        "mocha": "*"
     },
     "author": "developer"
 }
