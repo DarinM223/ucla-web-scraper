@@ -43,11 +43,24 @@ var properties = {
   subject: '#ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea option',
   course: '#ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal option',
   instructor: '#ctl00_BodyContentPlaceHolder_subdet_lblInstructor',
-  finalData: '#ctl00_BodyContentPlaceHolder_subdet_lblFinalExam'
+  finalData: '#ctl00_BodyContentPlaceHolder_subdet_lblFinalExam',
+  terms: '#ctl00_BodyContentPlaceHolder_SOCmain_lstTermDisp option'
 };
 
 function checkCSSType(item) {
   return (item.type === 'tag' && item.name === 'option');
+}
+
+function getTerms(body, callback) {
+  var $ = cheerio.load(body);
+
+  $(properties.terms).each(function() {
+    if (checkCSSType(this)) {
+      callback(null, this.attribs.value); // return term
+    } else {
+      callback(new Error('Check CSS type failed in getTerms()'));
+    }
+  });
 }
 
 function getSubjects(body, callback) {
@@ -145,6 +158,7 @@ module.exports = function(term, mongoURL) {
   collection = db.get(term);
 
   return {
+    getTerms: getTerms,
     getSubjects: getSubjects,
     getCourses: getCourses,
     getClassData: getClassData,

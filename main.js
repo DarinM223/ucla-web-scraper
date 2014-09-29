@@ -72,10 +72,37 @@ function generateClusters() {
   }
 }
 
+function processData(answer) {
+  var number = parseInt(answer, 10);
+  if (number && number >= 0 && number <= termArray.length) {
+    console.log('Saving term ' + termArray[number-1]);
+    generateClusters();
+    console.log('Created ' + clusterArr.length + ' workers');
+    loadTerm(termArray[number-1]);
+  } else {
+    console.log(answer + ' is not a valid number');
+  }
+}
+
 if (cluster.isMaster) {
-  generateClusters();
-  console.log('Created ' + clusterArr.length + ' workers');
-  loadTerm('14F');
+  var termArray = [];
+  request('http://www.registrar.ucla.edu/schedule/schedulehome.aspx', function(err, res, body) {
+    if (!err && res.statusCode === 200) {
+      scraper.getTerms(body, function(err, term) {
+        termArray.push(term);
+      });
+      console.log('Enter the term you want to save: ');
+      for (var i = 0; i < termArray.length; i++) {
+        console.log((i+1) + ". " + termArray[i]);
+      }
+      process.stdin.resume();
+      process.stdin.setEncoding('ascii');
+
+      process.stdin.on('data', function(input) {
+        processData(input);
+      });
+    }
+  });
 } else {
   process.on('message', function(task) {
     if (task) {
