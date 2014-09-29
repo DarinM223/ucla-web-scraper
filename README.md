@@ -28,8 +28,8 @@ To install the dependencies. To run the server, enter:
 Right now after it finishes adding all of the courses it will hang
 and you will have to end the process by pressing Ctrl-C.
 
-The scraper should take around 10-20 minutes to run on an i5
-processor. Because it uses the cluster library to efficiently use
+The scraper should take around 3-4 minutes to run on an i5
+processor on UCLA's network connection :). Because it uses the cluster library to efficiently use
 all of the cores, processors with more cores will be faster. Right now it only stores data from the Fall 2014 quarter.
 To view some of the data, enter:
 
@@ -41,4 +41,6 @@ To view how much data was saved, enter inside the mongo console:
 
     db["14F"].find().count()
 
-It should return around 2700-2800 elements
+It should return around 2700-2900 elements
+
+![Time proof](http://i.imgur.com/JPpGk4S.png?1)

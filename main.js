@@ -89,19 +89,21 @@ if (cluster.isMaster) {
           scraper.getClassData(body, function(err, classList, courseLinks) {
             for (var i = 0; i < courseLinks.length; i++) {
               (function(i) {
-                request('http://www.registrar.ucla.edu/schedule/' + courseLinks[i], function(err, res, body) {
-                  if (!err && res.statusCode === 200) {
-                    scraper.getSectionData(body, classList[i]);
+                if (classList[i] && courseLinks[i]) {
+                  request('http://www.registrar.ucla.edu/schedule/' + courseLinks[i], function(err, res, body) {
+                    if (!err && res.statusCode === 200) {
+                      scraper.getSectionData(body, classList[i]);
 
-                    if (i >= courseLinks.length - 1) {
-                      scraper.generateJSON(term, subject, classDesc, classList);
-                      process.send({ 
-                        'subject': subject,
-                        'classDesc': classDesc
-                      });
+                      if (i >= courseLinks.length - 1) {
+                        scraper.generateJSON(term, subject, classDesc, classList);
+                        process.send({ 
+                          'subject': subject,
+                          'classDesc': classDesc
+                        });
+                      }
                     }
-                  }
-                });
+                  });
+                }
               })(i);
             }
           });
