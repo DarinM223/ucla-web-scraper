@@ -1,3 +1,5 @@
+/* @flow */
+
 // require needed libraries (cheerio for server side JQuery manipulation)
 
 var cheerio = require('cheerio');
@@ -147,12 +149,21 @@ function generateJSON(term, subject, classDesc, classList) {
     classes: classList
   };
 
-  collection.insert(finalObj, function(err, data) {
-    if (err)
-      console.log('Error inserting into database');
-  });
+  if (collection && collection.insert) {
+    collection.insert(finalObj, function(err, data) {
+      if (err)
+        console.log('Error inserting into database');
+    });
+  } else {
+    console.log('Error!!!');
+  }
 }
 
+/**
+ * @param {string} term
+ * @param {string} mongoURL
+ * @return {any}
+ */
 module.exports = function(term, mongoURL) {
   db = monk(mongoURL);
   collection = db.get(term);
@@ -165,4 +176,4 @@ module.exports = function(term, mongoURL) {
     getSectionData: getSectionData,
     generateJSON: generateJSON
   };
-}
+};

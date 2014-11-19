@@ -1,3 +1,5 @@
+/* @flow */
+
 /**
  * @param data:
  * Ex. [ ['LEC', 'DIS', 'DIS' ]
@@ -57,6 +59,7 @@ function buildJSONArray(data, attributes) {
   return jsonArr;
 }
 
-exports.transform = function(data, attributes) {
-  return buildJSONArray(data, attributes);
-};
+function transformClass() { }
+transformClass.prototype.transform = buildJSONArray;
+
+module.exports = new transformClass;

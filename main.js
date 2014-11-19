@@ -1,3 +1,5 @@
+/* @flow */
+
 var cluster = require('cluster');
 var request = require('request');
 var scraper = require('./scraper.js')('14F', 'localhost:27017/ucla');
@@ -7,7 +9,7 @@ var clusterArr = [];
 var currIndex = 0;
 
 function getWorker(clusterArr) {
-  if (clusterArr.length < 1) return null;
+  if (clusterArr.length && clusterArr.length < 1) return null;
 
   var myWorker = clusterArr[currIndex];
   if (currIndex === clusterArr.length - 1) {
@@ -33,15 +35,19 @@ function loadTerm(term) {
                 classDesc.split(' ').join('+');
 
                 // send task to worker
-                var myWorker= getWorker(clusterArr);
-                myWorker.worker.send({
-                  url: url,
-                  term: term,
-                  subject: subject,
-                  classDesc: classDesc
-                });
-                myWorker.tasks++;
-                console.log('Adding task: ' + subject + classDesc + ' to worker ' + myWorker.worker.id);
+                var myWorker = getWorker(clusterArr);
+                if (myWorker != null && myWorker.worker != null && myWorker.worker.send != null && myWorker.tasks != null) {
+                  myWorker.worker.send({
+                    url: url,
+                    term: term,
+                    subject: subject,
+                    classDesc: classDesc
+                  });
+                  myWorker.tasks++;
+                  console.log('Adding task: ' + subject + classDesc + ' to worker ' + myWorker.worker.id);
+                } else {
+                  console.log('Error!!!');
+                }
             });
           }
         });

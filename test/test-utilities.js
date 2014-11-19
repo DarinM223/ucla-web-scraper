@@ -1,3 +1,5 @@
+/* @flow */
+
 var should = require('should');
 var utilities = require('../utilities.js');
 
@@ -28,10 +30,10 @@ describe('Test if it transforms correctly', function() {
       [ 'Building1', 'Building2', 'Building3', 'Building4', 'Building5', 'Building6'],
       [ '1000', '1200', '500', '102A', '221B', '50C' ],
       [ '', 'Yes', '', '', 'Yes', ''],
-      [ 20, 30, 10, 40, 50, 60],
-      [ 100, 50, 80, 40, 80, 60],
-      [   0,  0,  0, 10, 0,  5],
-      [   5,  0,  0, 10, 0,  10],
+      [ '20',  '30', '10', '40', '50', '60'],
+      [ '100', '50', '80', '40', '80', '60'],
+      [   '0',  '0',  '0', '10', '0',  '5'],
+      [   '5',  '0',  '0', '10', '0',  '10'],
       [ 'Open', 'Open', 'Open', 'Closed', 'Open', 'W-List' ]
     ];
 
