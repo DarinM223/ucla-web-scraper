@@ -97,6 +97,7 @@ function getClassData(body, callback) {
   for (var i = 0; i < selectionArr.length; i++) {
     selectionData.push([]);
   }
+
   for (var i = 0; i < selectionArr.length; i++) {
     $(selectionArr[i]).each(function () {
       if (this && this.children && this.children[0] && this.children[0].data) {
@@ -106,7 +107,12 @@ function getClassData(body, callback) {
   }
 
   // O(n^2) running time
-  var objArr = utilities.transform(selectionData, nameArr);
+  var objArr = utilities.transform(selectionData, nameArr).map(function(elem) {
+    return {
+      data: elem,
+      link: null
+    };
+  });
 
   var courseLinks = [];
   // get course links
@@ -116,7 +122,12 @@ function getClassData(body, callback) {
       courseLinks.push(a[0].attribs.href);
     }
   });
-  callback(null, objArr, courseLinks);
+
+  for (var i = 0; i < objArr.length; i++) {
+    objArr[i].link = courseLinks[i];
+  }
+
+  callback(null, objArr);
 }
 
 function getSectionData(body, classData) {

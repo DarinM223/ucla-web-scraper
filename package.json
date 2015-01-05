@@ -11,7 +11,8 @@
         "mongodb": "*",
         "monk": "*",
         "should": "*",
-        "mocha": "*"
+        "mocha": "*",
+        "async": "*"
     },
     "author": "developer"
 }
