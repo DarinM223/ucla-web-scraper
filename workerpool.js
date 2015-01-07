@@ -57,18 +57,18 @@ WorkerPool.prototype.run = function(data, callback) {
 
   var freeIndex = this.freeWorkers.pop();
   if (freeIndex === undefined) {
-    taskQueue.enqueue(new Node(data, callback));
+    this.taskQueue.enqueue(new Node(data, callback));
   } else {
     var worker = this.workers[freeIndex];
 
-    worker.addEventListener('message', function(event) {
+    worker.onmessage = function(event) {
       _this.freeWorkers.push(freeIndex);
       if (!_this.taskQueue.isEmpty()) {
         var currentTask = _this.taskQueue.dequeue();
         _this.run(currentTask.data, currentTask.callback);
       }
       callback(event.data);
-    });
+    };
 
     worker.postMessage(data);
   }

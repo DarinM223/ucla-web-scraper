@@ -7,15 +7,16 @@ var monk = require('monk');
 var utilities = require('./utilities.js');
 var db, collection;
 var selectors = require('./selectors.js');
-// var threads_a_gogo = require('threads_a_gogo');
+var Worker = require('webworker-threads').Worker;
 var WorkerPool = require('./workerpool.js');
 
-var ScraperWorkerPool = new WorkerPool(10, function() {
+var ScraperWorkerPool = new WorkerPool(100, function() {
   importScripts('./thread_code_build.js');
   var thread_code = require('threads');
 
   this.addEventListener('message', function(event) {
-    postMessage(thread_code.getClassData(event.data));
+    var objArr = thread_code.getClassData(event.data);
+    postMessage(objArr);
   });
 });
 

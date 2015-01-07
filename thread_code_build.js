@@ -17464,7 +17464,7 @@ function getClassData(body) {
   }
 
   // O(n^2) running time
-  var objArr = utilities.transform(selectionData, nameArr).map(function(elem) {
+  var objArr = utilities.transform(selectionData, selectors.nameArr).map(function(elem) {
     return {
       data: elem,
       link: null
