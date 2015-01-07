@@ -1,18 +1,20 @@
 {
-    "name": "UCLAscraper",
-    "version": "0.0.0",
-    "description": "Web scraper for UCLA's schedule of classes",
-    "scripts": {
-      "test": "./node_modules/.bin/mocha"
-    },
-    "dependencies": {
-        "request": "*",
-        "cheerio": "*",
-        "mongodb": "*",
-        "monk": "*",
-        "should": "*",
-        "mocha": "*",
-        "async": "*"
-    },
-    "author": "developer"
+  "name": "UCLAscraper",
+  "version": "0.0.0",
+  "description": "Web scraper for UCLA's schedule of classes",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "dependencies": {
+    "async": "*",
+    "cheerio": "*",
+    "mocha": "*",
+    "mongodb": "*",
+    "monk": "*",
+    "request": "*",
+    "should": "*",
+    "threads_a_gogo": "*",
+    "webworker-threads": "*"
+  },
+  "author": "developer"
 }

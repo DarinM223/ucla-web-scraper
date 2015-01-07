@@ -6,40 +6,18 @@ var cheerio = require('cheerio');
 var monk = require('monk');
 var utilities = require('./utilities.js');
 var db, collection;
+var selectors = require('./selectors.js');
+// var threads_a_gogo = require('threads_a_gogo');
+var WorkerPool = require('./workerpool.js');
 
-// attribute list
-var nameArr = [
-  { name: 'dataType', type:'string' },
-  { name: 'sectionNumber', type:'string' },
-  { name: 'days', type:'string' },
-  { name: 'timeStart', type:'string' },
-  { name: 'timeEnd', type:'string' },
-  { name: 'building', type:'string' },
-  { name: 'room', type:'string' },
-  { name: 'restrict', type:'string' },
-  { name: 'enrollTotal', type:'integer' },
-  { name: 'enrollCap', type:'integer' },
-  { name: 'waitTotal', type:'integer' },
-  { name: 'waitCap', type:'integer'},
-  { name: 'status', type:'string'}
-];
+var ScraperWorkerPool = new WorkerPool(10, function() {
+  importScripts('./thread_code_build.js');
+  var thread_code = require('threads');
 
-// jQuery selections to fill class data
-var selectionArr = [
-  '.dgdClassDataActType span',
-  '.dgdClassDataSectionNumber span',
-  '.dgdClassDataDays span',
-  '.dgdClassDataTimeStart span',
-  '.dgdClassDataTimeEnd span',
-  '.dgdClassDataBuilding span',
-  '.dgdClassDataRoom span',
-  '.dgdClassDataRestrict span',
-  '.dgdClassDataEnrollTotal span',
-  '.dgdClassDataEnrollCap span',
-  '.dgdClassDataWaitListTotal span',
-  '.dgdClassDataWaitListCap span',
-  '.dgdClassDataStatus span'
-];
+  this.addEventListener('message', function(event) {
+    postMessage(thread_code.getClassData(event.data));
+  });
+});
 
 var properties = {
   subject: '#ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea option',
@@ -90,44 +68,9 @@ function getCourses(body, callback) {
 }
 
 function getClassData(body, callback) {
-  var $ = cheerio.load(body);
-
-  var selectionData = [];
-
-  for (var i = 0; i < selectionArr.length; i++) {
-    selectionData.push([]);
-  }
-
-  for (var i = 0; i < selectionArr.length; i++) {
-    $(selectionArr[i]).each(function () {
-      if (this && this.children && this.children[0] && this.children[0].data) {
-          selectionData[i].push(this.children[0].data.trim());
-      }
-    });
-  }
-
-  // O(n^2) running time
-  var objArr = utilities.transform(selectionData, nameArr).map(function(elem) {
-    return {
-      data: elem,
-      link: null
-    };
+  ScraperWorkerPool.run(body, function(data) {
+    callback(null, data);
   });
-
-  var courseLinks = [];
-  // get course links
-  $('.dgdTemplateGrid').each(function() {
-    var a = $(this).find('.dgdClassDataColumnIDNumber a').first();
-    if (a && a[0] && a[0].type === 'tag') {
-      courseLinks.push(a[0].attribs.href);
-    }
-  });
-
-  for (var i = 0; i < objArr.length; i++) {
-    objArr[i].link = courseLinks[i];
-  }
-
-  callback(null, objArr);
 }
 
 function getSectionData(body, classData) {

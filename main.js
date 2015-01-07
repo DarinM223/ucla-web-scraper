@@ -2,12 +2,15 @@
 
 var cluster = require('cluster');
 var request = require('request');
-var scraper = require('./scraper.js')('14F', 'localhost:27017/ucla');
 var async = require('async');
 
 // array of workers
 var clusterArr = [];
 var currIndex = 0;
+
+var termArray = [];
+
+var scraper = require('./scraper.js')('14F', 'localhost:27017/ucla');
 
 function getWorker(clusterArr) {
   if (clusterArr.length && clusterArr.length < 1) return null;
@@ -118,7 +121,6 @@ function processData(answer) {
 }
 
 if (cluster.isMaster) {
-  var termArray = [];
   request('http://www.registrar.ucla.edu/schedule/schedulehome.aspx', function(err, res, body) {
     if (!err && res.statusCode === 200) {
       scraper.getTerms(body, function(err, term) {
