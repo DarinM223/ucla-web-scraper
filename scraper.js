@@ -41,26 +41,10 @@ function getClassData(body, callback) {
   });
 }
 
-function getSectionData(body, classData) {
-  var $ = cheerio.load(body);
-  var instructorData = null, finalData = null;
-
-  $(selectors.properties.instructor).each(function() {
-    if (this && this.children && this.children[0] && this.children[0].data) {
-      instructorData = this.children[0].data.trim();
-      return false;
-    }
+function getSectionData(body, callback) {
+  workerPools.SectionsWorkerPool.run(body, function(data) {
+    callback(null, data);
   });
-
-  $(selectors.properties.finalData).each(function() {
-   if (this && this.children && this.children[0] &&  this.children[0].data) {
-      finalData = this.children[0].data.trim();
-      return false;
-    }
-  });
-
-  classData.instructor = instructorData;
-  classData.final = finalData;
 }
 
 function generateJSON(term, subject, classDesc, classList) {

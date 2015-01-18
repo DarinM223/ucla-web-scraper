@@ -12542,6 +12542,9 @@ module.exports={
 }
 
 },{}],63:[function(require,module,exports){
+/* @flow */
+'use strict';
+
 // attribute list
 exports.nameArr = [
   { name: 'dataType', type:'string' },
@@ -12586,6 +12589,7 @@ exports.properties = {
 
 },{}],64:[function(require,module,exports){
 /* @flow */
+'use strict';
 
 /**
  * @param data:
@@ -17450,6 +17454,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":87,"_process":73,"inherits":71}],"threads":[function(require,module,exports){
+/* @flow */
 'use strict';
 
 var cheerio = require('cheerio');
@@ -17542,5 +17547,26 @@ exports.getClassData = function getClassData(body) {
   
   return objArr;
 }
+
+exports.getSectionData = function getSectionData(body) {
+  var $ = cheerio.load(body);
+  var instructorData = null, finalData = null;
+
+  $(selectors.properties.instructor).each(function() {
+    if (this && this.children && this.children[0] && this.children[0].data) {
+      instructorData = this.children[0].data.trim();
+      return false;
+    }
+  });
+
+  $(selectors.properties.finalData).each(function() {
+   if (this && this.children && this.children[0] &&  this.children[0].data) {
+      finalData = this.children[0].data.trim();
+      return false;
+    }
+  });
+
+  return [instructorData, finalData];
+};
 
 },{"./selectors.js":63,"./utilities.js":64,"cheerio":1}]},{},[]);

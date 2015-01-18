@@ -91,3 +91,24 @@ exports.getClassData = function getClassData(body) {
   
   return objArr;
 }
+
+exports.getSectionData = function getSectionData(body) {
+  var $ = cheerio.load(body);
+  var instructorData = null, finalData = null;
+
+  $(selectors.properties.instructor).each(function() {
+    if (this && this.children && this.children[0] && this.children[0].data) {
+      instructorData = this.children[0].data.trim();
+      return false;
+    }
+  });
+
+  $(selectors.properties.finalData).each(function() {
+   if (this && this.children && this.children[0] &&  this.children[0].data) {
+      finalData = this.children[0].data.trim();
+      return false;
+    }
+  });
+
+  return [instructorData, finalData];
+};

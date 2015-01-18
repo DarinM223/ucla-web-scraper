@@ -79,8 +79,11 @@ function loadTerm(term, callback) {
     var handleCourse = function(course, callback) {
       request('http://www.registrar.ucla.edu/schedule/' + course.link, function(err, res, body) {
         if (!err && res.statusCode === 200) {
-          scraper.getSectionData(body, course.data);
-          return callback(err, course.data);
+          scraper.getSectionData(body, function(data) {
+            course.data.instructor = data[0];
+            course.data.final = data[1];
+            return callback(err, course.data);
+          });
         }
         return callback((err === null ? new Error('Error sending request') : error));
       });
