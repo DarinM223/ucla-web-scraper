@@ -1,11 +1,58 @@
 <html>
 
-<head></head>
+<head>
+</head>
 
 <body>
 
 <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 <script src="./thread_code_build.js"></script>
 </body>
+
+<script type="text/javascript">
+  var thread_code = require('threads');
+
+  (function($) {
+    function testGetTerms() {
+      $.ajax({
+        type: 'GET',
+        url: 'http://www.registrar.ucla.edu/schedule/schedulehome.aspx',
+        success: function(data, textStatus, jqXHR) {
+          var terms = thread_code.getTerms(data);
+          console.log(terms);
+        }
+      });
+    }
+
+    function testGetSubjects() {
+      $.ajax({
+        type: 'GET',
+        url: 'http://www.registrar.ucla.edu/schedule/schedulehome.aspx',
+        success: function(data, textStatus, jqXHR) {
+          var subjects = thread_code.getSubjects(data);
+          console.log(subjects);
+        }
+      });
+    }
+
+    function testGetCourses() {
+      $.ajax({
+        type: 'GET', 
+        url: 'http://www.registrar.ucla.edu/schedule/crsredir.aspx?termsel=15W&subareasel=COM+SCI',
+        success: function(data, textStatus, jqXHR) {
+          var courses = thread_code.getCourses(data);
+          console.log(courses);
+        }
+      });
+    }
+
+    function testGetClassData() {
+    }
+
+    testGetTerms();
+    testGetSubjects();
+    testGetCourses();
+  })(jQuery);
+</script>
 
 </html>

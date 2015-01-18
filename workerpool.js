@@ -1,3 +1,6 @@
+/* @flow */
+'use strict';
+
 var Worker = require('webworker-threads').Worker;
 
 function Node(data, callback) {
@@ -71,6 +74,13 @@ WorkerPool.prototype.run = function(data, callback) {
     };
 
     worker.postMessage(data);
+  }
+};
+
+WorkerPool.prototype.destroy = function() {
+  while (this.workers.length > 0) {
+    var worker = this.workers.pop();
+    worker.terminate();
   }
 };
 

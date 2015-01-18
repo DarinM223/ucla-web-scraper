@@ -1,4 +1,5 @@
 /* @flow */
+'use strict';
 
 var should = require('should');
 var utilities = require('../utilities.js');

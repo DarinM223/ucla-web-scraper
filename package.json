@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Web scraper for UCLA's schedule of classes",
   "scripts": {
+    "build": "./node_modules/.bin/browserify -r ./thread_code.js:threads > ./thread_code_build.js",
     "test": "./node_modules/.bin/mocha"
   },
   "dependencies": {
@@ -14,7 +15,9 @@
     "request": "*",
     "should": "*",
     "threads_a_gogo": "*",
-    "webworker-threads": "*"
+    "webworker-threads": "*",
+    "browserify": "*",
+    "underscore": "*"
   },
   "author": "developer"
 }

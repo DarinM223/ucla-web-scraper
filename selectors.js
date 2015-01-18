@@ -1,3 +1,6 @@
+/* @flow */
+'use strict';
+
 // attribute list
 exports.nameArr = [
   { name: 'dataType', type:'string' },
@@ -31,3 +34,11 @@ exports.selectionArr = [
   '.dgdClassDataWaitListCap span',
   '.dgdClassDataStatus span'
 ];
+
+exports.properties = {
+  subject: '#ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea option',
+  course: '#ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal option',
+  instructor: '#ctl00_BodyContentPlaceHolder_subdet_lblInstructor',
+  finalData: '#ctl00_BodyContentPlaceHolder_subdet_lblFinalExam',
+  terms: '#ctl00_BodyContentPlaceHolder_SOCmain_lstTermDisp option'
+};

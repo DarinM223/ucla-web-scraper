@@ -1,75 +1,42 @@
 /* @flow */
+'use strict';
 
 // require needed libraries (cheerio for server side JQuery manipulation)
 
-var cheerio = require('cheerio');
 var monk = require('monk');
 var utilities = require('./utilities.js');
 var db, collection;
 var selectors = require('./selectors.js');
-var Worker = require('webworker-threads').Worker;
-var WorkerPool = require('./workerpool.js');
+var workerPools = require('./scraper_worker_pools.js');
+var cheerio = require('cheerio');
+var selectors = require('./selectors.js');
 
-var ScraperWorkerPool = new WorkerPool(100, function() {
-  importScripts('./thread_code_build.js');
-  var thread_code = require('threads');
-
-  this.addEventListener('message', function(event) {
-    var objArr = thread_code.getClassData(event.data);
-    postMessage(objArr);
-  });
-});
-
-var properties = {
-  subject: '#ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea option',
-  course: '#ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal option',
-  instructor: '#ctl00_BodyContentPlaceHolder_subdet_lblInstructor',
-  finalData: '#ctl00_BodyContentPlaceHolder_subdet_lblFinalExam',
-  terms: '#ctl00_BodyContentPlaceHolder_SOCmain_lstTermDisp option'
-};
-
-function checkCSSType(item) {
-  return (item.type === 'tag' && item.name === 'option');
-}
+var term_to_collection = {};
 
 function getTerms(body, callback) {
-  var $ = cheerio.load(body);
-
-  $(properties.terms).each(function() {
-    if (checkCSSType(this)) {
-      callback(null, this.attribs.value); // return term
-    } else {
-      callback(new Error('Check CSS type failed in getTerms()'));
-    }
+  console.log('Getting terms array');
+  workerPools.TermsWorkerPool.run(body, function(data) {
+    console.log('Finished getting terms');
+    callback(null, data);
   });
 }
 
 function getSubjects(body, callback) {
-  var $ = cheerio.load(body);
-
-  $(properties.subject).each(function() {
-    if (checkCSSType(this)) {
-      callback(null, this.attribs.value); // return subject
-    } else {
-      callback(new Error('Check CSS type failed in getSubjects()'));
-    }
+  console.log('Getting subjects');
+  workerPools.SubjectsWorkerPool.run(body, function(data) {
+    console.log('Finished getting subjects');
+    callback(null, data);
   });
 }
 
 function getCourses(body, callback) {
-  var $ = cheerio.load(body);
-
-  $(properties.course).each(function() {
-    if (checkCSSType(this)) {
-      callback(null, this.attribs.value); // return class description
-    } else {
-      callback(new Error('Check CSS type failed in getCourses()'));
-    }
+  workerPools.CoursesWorkerPool.run(body, function(data) {
+    callback(null, data);
   });
 }
 
 function getClassData(body, callback) {
-  ScraperWorkerPool.run(body, function(data) {
+  workerPools.ScraperWorkerPool.run(body, function(data) {
     callback(null, data);
   });
 }
@@ -78,14 +45,14 @@ function getSectionData(body, classData) {
   var $ = cheerio.load(body);
   var instructorData = null, finalData = null;
 
-  $(properties.instructor).each(function() {
+  $(selectors.properties.instructor).each(function() {
     if (this && this.children && this.children[0] && this.children[0].data) {
       instructorData = this.children[0].data.trim();
       return false;
     }
   });
 
-  $(properties.finalData).each(function() {
+  $(selectors.properties.finalData).each(function() {
    if (this && this.children && this.children[0] &&  this.children[0].data) {
       finalData = this.children[0].data.trim();
       return false;

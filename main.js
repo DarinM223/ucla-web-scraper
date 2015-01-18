@@ -1,18 +1,23 @@
 /* @flow */
+'use strict';
 
 var cluster = require('cluster');
 var request = require('request');
 var async = require('async');
 
+var workerPools = require('./scraper_worker_pools.js');
+
 // array of workers
-var clusterArr = [];
-var currIndex = 0;
+//var clusterArr = [];
+//var currIndex = 0;
 
-var termArray = [];
+//var termArray = [];
 
-var scraper = require('./scraper.js')('14F', 'localhost:27017/ucla');
+var scraper = require('./scraper.js')('Courses', 'localhost:27017/ucla');
 
-function LoadTerm(term, callback) {
+function loadTerm(term, callback) {
+  var finalCallback = callback;
+
   var requestSchedule = function(callback) {
     request('http://www.registrar.ucla.edu/schedule/schedulehome.aspx', function(err, res, body) {
       if (!err && res.statusCode === 200) {
@@ -23,27 +28,35 @@ function LoadTerm(term, callback) {
   };
 
   var getSubjects = function(body, callback) {
-    scraper.getSubjects(body, function(err, subject) {
-      var mySubject = subject.split(' ').join('+');
-      var url = 'http://www.registrar.ucla.edu/schedule/crsredir.aspx?termsel=' + term +
-        '&subareasel=' + mySubject;
-      request(url, function(err, res, body) {
-        if (!err && res.statusCode === 200) {
-          return callback(err, subject, body);
-        }
-        return callback((err === null ? new Error('Error sending request') : err));
+    async.waterfall([scraper.getSubjects.bind(null, body), function(subjectArr) {
+      async.map(subjectArr, function(subject) {
+        var mySubject = subject.split(' ').join('+');
+        var url = 'http://www.registrar.ucla.edu/schedule/crsredir.aspx?termsel=' + term +
+          '&subareasel=' + mySubject;
+        request(url, function(err, res, body) {
+          if (!err && res.statusCode === 200) {
+            return callback(err, subject, body);
+          }
+          return callback((err === null ? new Error('Error sending request') : err));
+        });
       });
+    }], function onCompleted() {
+      console.log('Finished retrieving subjects');
     });
   };
 
   var getCourses = function(subject, body, callback) {
-    scraper.getCourses(body, function(err, classDesc) {
-      var mySubject = subject.split(' ').join('+');
-      var url = 'http://www.registrar.ucla.edu/schedule/detselect.aspx?termsel=' + term +
-        '&subareasel=' + mySubject + '&idxcrs=' + 
-         classDesc.split(' ').join('+');
+    async.waterfall([scraper.getCourses.bind(null, body), function(coursesArr) {
+      async.map(coursesArr, function(classDesc) {
+        var mySubject = subject.split(' ').join('+');
+        var url = 'http://www.registrar.ucla.edu/schedule/detselect.aspx?termsel=' + term +
+          '&subareasel=' + mySubject + '&idxcrs=' + 
+           classDesc.split(' ').join('+');
 
-      return callback(err, url, subject, classDesc);
+        return callback(null, url, subject, classDesc);
+      });
+    }], function onCompleted() {
+      console.log('Finished retrieving courses');
     });
   };
 
@@ -92,13 +105,11 @@ function LoadTerm(term, callback) {
   });
 }
 
-function processData(answer) {
+function processData(termArray, answer) {
   var number = parseInt(answer, 10);
   if (number && number >= 0 && number <= termArray.length) {
     console.log('Saving term ' + termArray[number-1]);
-    LoadTerm(termArray[number-1], function(err) {
-      console.log('Finished scraping data');
-    });
+    loadTerm(termArray[number-1], function(err) { });
   } else {
     console.log(answer + ' is not a valid number');
   }
@@ -106,18 +117,22 @@ function processData(answer) {
 
 request('http://www.registrar.ucla.edu/schedule/schedulehome.aspx', function(err, res, body) {
   if (!err && res.statusCode === 200) {
-    scraper.getTerms(body, function(err, term) {
-      termArray.push(term);
-    });
-    console.log('Enter the term you want to save: ');
-    for (var i = 0; i < termArray.length; i++) {
-      console.log((i+1) + ". " + termArray[i]);
-    }
-    process.stdin.resume();
-    process.stdin.setEncoding('ascii');
+    async.waterfall([scraper.getTerms.bind(null, body), function(termsArr, callback) {
+      workerPools.TermsWorkerPool.destroy();
+      console.log('Enter the term you want to save: ');
+      for (var i = 0; i < termsArr.length; i++) {
+        console.log((i+1) + ". " + termsArr[i]);
+      }
+      process.stdin.resume();
+      process.stdin.setEncoding('ascii');
 
-    process.stdin.on('data', function(input) {
-      processData(input);
+      process.stdin.on('data', function(input) {
+        processData(termsArr, input);
+      });
+    }], function(err) {
+      if (err) {
+        console.log(err);
+      }
     });
   }
 });

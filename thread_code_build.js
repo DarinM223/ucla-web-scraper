@@ -12576,6 +12576,14 @@ exports.selectionArr = [
   '.dgdClassDataStatus span'
 ];
 
+exports.properties = {
+  subject: '#ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea option',
+  course: '#ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal option',
+  instructor: '#ctl00_BodyContentPlaceHolder_subdet_lblInstructor',
+  finalData: '#ctl00_BodyContentPlaceHolder_subdet_lblFinalExam',
+  terms: '#ctl00_BodyContentPlaceHolder_SOCmain_lstTermDisp option'
+};
+
 },{}],64:[function(require,module,exports){
 /* @flow */
 
@@ -17442,11 +17450,59 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./support/isBuffer":87,"_process":73,"inherits":71}],"threads":[function(require,module,exports){
+'use strict';
+
 var cheerio = require('cheerio');
 var utilities = require('./utilities.js');
 var selectors = require('./selectors.js');
 
-function getClassData(body) {
+function checkCSSType(item) {
+  return (item.type === 'tag' && item.name === 'option');
+}
+
+exports.getTerms = function getTerms(body) {
+  var $ = cheerio.load(body);
+
+  var terms = [];
+
+  $(selectors.properties.terms).each(function() {
+    if (checkCSSType(this)) {
+      terms.push(this.attribs.value);
+    } 
+  });
+
+  return terms;
+}
+
+exports.getSubjects = function getSubjects(body) {
+  var $ = cheerio.load(body);
+
+  var subjects = [];
+
+  $(selectors.properties.subject).each(function() {
+    if (checkCSSType(this)) {
+      subjects.push(this.attribs.value);
+    } 
+  });
+
+  return subjects;
+}
+
+exports.getCourses = function getCourses(body) {
+  var $ = cheerio.load(body);
+
+  var courses = [];
+
+  $(selectors.properties.course).each(function() {
+    if (checkCSSType(this)) {
+      courses.push(this.attribs.value);
+    } 
+  });
+
+  return courses;
+}
+
+exports.getClassData = function getClassData(body) {
   var $ = cheerio.load(body);
 
   var selectionData = [];
@@ -17486,7 +17542,5 @@ function getClassData(body) {
   
   return objArr;
 }
-
-exports.getClassData = getClassData;
 
 },{"./selectors.js":63,"./utilities.js":64,"cheerio":1}]},{},[]);
